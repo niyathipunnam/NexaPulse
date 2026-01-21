@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaPulse – MedicoConnect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="nav-logo-mark">
+                    <span class="pulse-dot"></span>
+                    <span class="pulse-line"></span>
+                </div>
+                <div class="nav-brand">
+                    <span class="brand-main">NexaPulse</span>
+                    <span class="brand-sub">(MedicoConnect)</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="#how-it-works">How it works</a>
+                <a href="#for-patients">For patients</a>
+                <a href="#for-doctors">For doctors</a>
+            </nav>
+            <div class="nav-actions">
+                <!-- Patient & doctor quick access -->
+                <a href="{{ url_for('patient_login') }}" class="btn btn-ghost">Patient login</a>
+                <a href="{{ url_for('doctor_login') }}" class="btn btn-outline">Doctor login</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-text">
+                <h1>Bridging patients and<br><span class="gradient-text">real, verified doctors</span></h1>
+                <p class="hero-subtitle">
+                    NexaPulse connects people who are worried about their symptoms with trusted doctors
+                    who are ready to guide them in minutes.
+                </p>
+                <div class="hero-actions">
+                    <!-- Patient primary CTA -->
+                    <a href="{{ url_for('patient_login') }}" class="btn btn-primary big">I’m a patient</a>
+                    <!-- Doctor goes to login (then can register if new) -->
+                    <a href="{{ url_for('doctor_login') }}" class="btn btn-outline big">I’m a doctor</a>
+                </div>
+                <div class="hero-tags">
+                    <span>24×7 guidance</span>
+                    <span>Verified doctors</span>
+                    <span>Private chat</span>
+                </div>
+            </div>
+            <div class="hero-card">
+                <div class="hero-card-header">
+                    <span class="status-dot"></span>
+                    <span>Live consultation preview</span>
+                </div>
+                <div class="hero-card-body">
+                    <div class="chat-bubble patient">
+                        “I’m feeling chest tightness and I’m scared. What should I do?”
+                    </div>
+                    <div class="chat-bubble doctor">
+                        “I’m a cardiologist. I’ll ask a few quick questions and guide you step by step.”
+                    </div>
+                    <div class="hero-card-footer">
+                        <div class="doc-pill">
+                            <div class="doc-avatar">DR</div>
+                            <div>
+                                <p class="doc-name">Dr. Meera Shah</p>
+                                <p class="doc-meta">Cardiologist · Verified</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary small">Start secure chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-glow"></div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how-it-works" class="section">
+        <div class="section-header">
+            <h2>How NexaPulse works</h2>
+            <p>Simple steps to move from panic to clarity.</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <span class="step-number">1</span>
+                <h3>Describe your problem</h3>
+                <p>Log in and share your symptoms in your own words, then choose a specialization like cardiology or neurology.</p>
+            </div>
+            <div class="step-card">
+                <span class="step-number">2</span>
+                <h3>Get multiple replies</h3>
+                <p>Verified doctors in that specialty respond with guidance, so you see different expert perspectives.</p>
+            </div>
+            <div class="step-card">
+                <span class="step-number">3</span>
+                <h3>Choose & connect</h3>
+                <p>Select the doctor you trust, open a private chat, or schedule a consultation if it looks serious.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- For patients -->
+    <section id="for-patients" class="section section-split">
+        <div class="section-content">
+            <h2>For patients</h2>
+            <ul class="feature-list">
+                <li>Safe guidance instead of random internet panic.</li>
+                <li>Connect only with verified doctors and see their credentials.</li>
+                <li>Build long-term relationships with doctors who know your history.</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h3>Why patients trust NexaPulse</h3>
+            <p>No confusing search results, no generic AI disclaimers—just real humans giving you clarity.</p>
+        </div>
+    </section>
+
+    <!-- For doctors -->
+    <section id="for-doctors" class="section section-split reverse">
+        <div class="section-content">
+            <h2>For doctors</h2>
+            <ul class="feature-list">
+                <li>Showcase your expertise, experience, and verified license.</li>
+                <li>Reach patients who are actively looking for guidance.</li>
+                <li>Build reputation and long‑term patient relationships.</li>
+            </ul>
+        </div>
+        <div class="section-card">
+            <h3>Grow with NexaPulse</h3>
+            <p>Turn your free time into meaningful impact by guiding patients who genuinely need support.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 NexaPulse (MedicoConnect). All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

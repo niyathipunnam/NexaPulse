@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Dashboard – NexaPulse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="nav">
+    <div class="nav-container">
+        <div class="nav-left">
+            <div class="nav-logo-mark">
+                <span class="pulse-dot"></span>
+                <span class="pulse-line"></span>
+            </div>
+            <div class="nav-brand">
+                <span class="brand-main">NexaPulse</span>
+                <span class="brand-sub">Doctor dashboard</span>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <!-- Chat navigation: goes to same page, chat area -->
+            <a href="{{ url_for('doctor_dashboard', _anchor='doctor-chat') }}" class="nav-chat-btn">Chat</a>
+            <a href="{{ url_for('doctor_logout') }}">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="dashboard-wrapper">
+
+    <!-- Welcome / header -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-text">
+                <h1>Welcome back, <span class="gradient-text">{{ doctor_name }}</span></h1>
+                <p class="hero-subtitle">
+                    You are logged in as {{ doctor_speciality }}
+                    {% if workplace %} at {{ workplace }}{% endif %}.
+                    {% if experience_level %} Profile: {{ experience_level }} doctor.{% endif %}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- KPI cards -->
+    <section class="dashboard-kpis">
+        <div class="dashboard-card">
+            <h3>New cases</h3>
+            <div class="kpi-number">{{ new_cases }}</div>
+            <p>Posts currently visible in your feed.</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>Total replies</h3>
+            <div class="kpi-number">{{ responses_today }}</div>
+            <p>Responses from all doctors on these posts.</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>Follow‑ups pending</h3>
+            <div class="kpi-number">{{ followups }}</div>
+            <p>Conversations that may need another review.</p>
+        </div>
+    </section>
+
+    <!-- Patient feed -->
+    <section class="recent-questions">
+        <div class="recent-questions-inner">
+            <h2>Patient feed</h2>
+            <p class="section-subtitle">
+                Patients post their health questions here. Doctors from all specialties can reply below each post.
+            </p>
+
+            {% if posts %}
+                <ul class="recent-questions-list">
+                    {% for post in posts %}
+                        <li class="recent-question-item">
+                            <!-- Feed header: patient avatar + meta -->
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                                <div style="display:flex; align-items:center; gap:0.5rem;">
+                                    <div class="doc-avatar" style="width:30px;height:30px;">
+                                        {{ (post.patient_name[:1] if post.patient_name else 'P') | upper }}
+                                    </div>
+                                    <div>
+                                        <div style="font-size:0.82rem; font-weight:500;">
+                                            {{ post.patient_name or 'Patient' }}
+                                        </div>
+                                        <div style="font-size:0.75rem; color:#9ca3af;">
+                                            {% if post.created_at %}
+                                                {{ post.created_at.strftime("%d %b %Y · %I:%M %p") }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post body (question text) -->
+                            <div class="question-link" style="margin-bottom:0.4rem;">
+                                {{ post.question_text }}
+                            </div>
+
+                            <!-- Existing replies from all doctors -->
+                            {% if post.replies %}
+                                <div style="margin-top:0.25rem; display:flex; flex-direction:column; gap:0.35rem;">
+                                    {% for r in post.replies %}
+                                        <div>
+                                            <div style="font-size:0.76rem; color:#9ca3af; margin-bottom:0.1rem;">
+                                                {{ r.doctor_name }} · {{ r.specialization }}
+                                                {% if r.created_at %}
+                                                    · {{ r.created_at.strftime("%d %b %Y %I:%M %p") }}
+                                                {% endif %}
+                                            </div>
+
+                                            {% if r.doctor_id == session['doctor_id'] %}
+                                                <!-- Editable bubble for current doctor's reply -->
+                                                {% if request.args.get('edit_reply_id', type=int) == r.id %}
+                                                    <!-- Edit mode -->
+                                                    <form
+                                                        action="{{ url_for('doctor_edit_reply', reply_id=r.id, question_id=post.id) }}"
+                                                        method="post"
+                                                    >
+                                                        <textarea
+                                                            name="reply_text"
+                                                            rows="2"
+                                                            style="width:100%; border-radius:10px; border:1px solid rgba(148,163,184,0.5); background:rgba(15,23,42,0.95); color:#e5e7eb; font-size:0.82rem; padding:0.4rem 0.6rem; resize:vertical;"
+                                                            required
+                                                        >{{ r.reply_text }}</textarea>
+                                                        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.35rem;">
+                                                            <button type="submit" class="btn btn-primary small">
+                                                                Save
+                                                            </button>
+                                                            <a
+                                                                href="{{ url_for('doctor_dashboard') }}"
+                                                                class="btn btn-secondary small"
+                                                                style="text-decoration:none;"
+                                                            >
+                                                                Cancel
+                                                            </a>
+                                                        </div>
+                                                    </form>
+                                                {% else %}
+                                                    <!-- Normal display + Edit button -->
+                                                    <div class="chat-bubble doctor">
+                                                        {{ r.reply_text }}
+                                                    </div>
+                                                    <div style="margin-top:0.2rem; display:flex; justify-content:flex-end;">
+                                                        <a
+                                                            href="{{ url_for('doctor_dashboard', edit_reply_id=r.id) }}#reply-{{ r.id }}"
+                                                            style="font-size:0.75rem; color:#60a5fa; text-decoration:none;"
+                                                        >
+                                                            Edit reply
+                                                        </a>
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <!-- Other doctors' replies (read-only) -->
+                                                <div class="chat-bubble doctor">
+                                                    {{ r.reply_text }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <!-- Reply form for current doctor -->
+                            <form
+                                action="{{ url_for('doctor_post_reply', question_id=post.id) }}"
+                                method="post"
+                                style="margin-top:0.5rem;"
+                            >
+                                <div style="font-size:0.76rem; color:#9ca3af; margin-bottom:0.1rem;">
+                                    Add your reply
+                                </div>
+                                <textarea
+                                    name="reply_text"
+                                    rows="2"
+                                    placeholder="Write your guidance for this patient..."
+                                    style="width:100%; border-radius:10px; border:1px solid rgba(148,163,184,0.5); background:rgba(15,23,42,0.95); color:#e5e7eb; font-size:0.82rem; padding:0.4rem 0.6rem; resize:vertical;"
+                                    required
+                                ></textarea>
+                                <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.35rem;">
+                                    <button type="submit" class="btn btn-primary small">
+                                        Post reply
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Open private chat with this patient about this question -->
+                            {% if post.patient_id %}
+                                <div style="margin-top:0.4rem; display:flex; justify-content:flex-end; gap:0.5rem;">
+                                    <a
+                                        href="{{ url_for('doctor_chat', patient_id=post.patient_id, question_id=post.id) }}"
+                                        class="btn btn-secondary small"
+                                        style="text-decoration:none;"
+                                    >
+                                        Open chat with {{ post.patient_name or 'Patient' }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="section-subtitle">
+                    No posts yet. When patients ask questions, they will appear here as a feed.
+                </p>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Chat section target for nav button -->
+    <section id="doctor-chat" class="doctor-chat-placeholder">
+        <h2>Doctor chat</h2>
+        <p class="section-subtitle">
+            Use the “Open chat” button under each question to go to the private chat screen.
+        </p>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>© 2026 NexaPulse. Doctor view for registered professionals only.</p>
+</footer>
+
+</body>
+</html>

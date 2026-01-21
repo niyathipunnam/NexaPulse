@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Dashboard – NexaPulse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="nav">
+    <div class="nav-container">
+        <div class="nav-left">
+            <div class="nav-logo-mark">
+                <span class="pulse-dot"></span>
+                <span class="pulse-line"></span>
+            </div>
+            <div class="nav-brand">
+                <span class="brand-main">NexaPulse</span>
+                <span class="brand-sub">Patient dashboard</span>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('patient_logout') }}">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="dashboard-wrapper">
+
+    <!-- Welcome / header -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-text">
+                <h1>Hi, <span class="gradient-text">{{ patient_name }}</span></h1>
+                <p class="hero-subtitle">
+                    Share your health concerns and follow replies from verified doctors in your feed.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Post form (upload post option) -->
+    <section class="recent-questions">
+        <div class="recent-questions-inner">
+            <h2>Create a new post</h2>
+            <p class="section-subtitle">
+                Describe your symptoms or question. A doctor will reply in this feed.
+            </p>
+
+            <form
+                action="{{ url_for('patient_create_post') }}"
+                method="post"
+                style="margin-top:0.6rem;"
+            >
+                <textarea
+                    name="question_text"
+                    rows="3"
+                    placeholder="Type your health question or describe your symptoms..."
+                    style="width:100%; border-radius:12px; border:1px solid rgba(148,163,184,0.5); background:rgba(15,23,42,0.95); color:#e5e7eb; font-size:0.9rem; padding:0.6rem 0.75rem; resize:vertical;"
+                    required
+                ></textarea>
+                <div style="display:flex; justify-content:flex-end; margin-top:0.5rem;">
+                    <button type="submit" class="btn btn-primary">
+                        Post to feed
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Feed: posts + doctors' replies -->
+    <section class="recent-questions">
+        <div class="recent-questions-inner">
+            <h2>Your health feed</h2>
+            <p class="section-subtitle">
+                See what you and other patients are asking and how doctors respond.
+            </p>
+
+            {% if posts %}
+                <ul class="recent-questions-list">
+                    {% for post in posts %}
+                        <li class="recent-question-item">
+                            <!-- Post header -->
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                                <div style="display:flex; align-items:center; gap:0.5rem;">
+                                    <div class="doc-avatar" style="width:30px;height:30px;">
+                                        {{ (post.patient_name[:1] if post.patient_name else 'P') | upper }}
+                                    </div>
+                                    <div>
+                                        <div style="font-size:0.82rem; font-weight:500;">
+                                            {{ post.patient_name or 'Patient' }}
+                                        </div>
+                                        <div style="font-size:0.75rem; color:#9ca3af;">
+                                            {% if post.created_at %}
+                                                {{ post.created_at.strftime("%d %b %Y · %I:%M %p") }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post body -->
+                            <div class="question-link" style="margin-bottom:0.4rem;">
+                                {{ post.question_text }}
+                            </div>
+
+                            <!-- Doctors' replies -->
+                            {% if post.replies %}
+                                <div style="margin-top:0.25rem; display:flex; flex-direction:column; gap:0.5rem;">
+                                    {% for r in post.replies %}
+                                        <div>
+                                            <div style="font-size:0.76rem; color:#9ca3af; margin-bottom:0.1rem;">
+                                                <a
+                                                    href="{{ url_for('doctor_profile', doctor_id=r.doctor_id) }}"
+                                                    style="color:#a5b4fc; text-decoration:none;"
+                                                >
+                                                    Dr. {{ r.doctor_name }}
+                                                </a>
+                                                · {{ r.specialization }}
+                                                {% if r.created_at %}
+                                                    · {{ r.created_at.strftime("%d %b %Y %I:%M %p") }}
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- CLICKABLE REPLY → CHAT PAGE -->
+                                            <a
+                                                href="{{ url_for('patient_chat', doctor_id=r.doctor_id, question_id=post.id) }}"
+                                                style="text-decoration:none; color:inherit;"
+                                            >
+                                                <div class="chat-bubble doctor" style="cursor:pointer;">
+                                                    {{ r.reply_text }}
+                                                </div>
+                                            </a>
+
+                                            <!-- Optional extra buttons; you can keep or delete -->
+                                            <div style="margin-top:0.25rem; display:flex; justify-content:flex-end; gap:0.5rem;">
+                                                <a
+                                                    href="{{ url_for('doctor_profile', doctor_id=r.doctor_id) }}"
+                                                    class="btn btn-outline small"
+                                                >
+                                                    View full profile
+                                                </a>
+                                                <a
+                                                    href="{{ url_for('patient_chat', doctor_id=r.doctor_id, question_id=post.id) }}"
+                                                    class="btn btn-primary small"
+                                                >
+                                                    Open private chat
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="section-subtitle" style="margin-top:0.3rem;">
+                                    No replies yet. A doctor will respond soon.
+                                </p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="section-subtitle">
+                    No posts yet. Create your first post using the form above.
+                </p>
+            {% endif %}
+        </div>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <p>© 2026 NexaPulse. Patient view for registered users only.</p>
+</footer>
+
+</body>
+</html>

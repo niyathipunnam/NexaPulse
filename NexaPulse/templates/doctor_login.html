@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexaPulse – Doctor Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="body-auth">
+    <!-- Navbar -->
+    <header class="nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="nav-logo-mark">
+                    <span class="pulse-dot"></span>
+                    <span class="pulse-line"></span>
+                </div>
+                <div class="nav-brand">
+                    <span class="brand-main">NexaPulse</span>
+                    <span class="brand-sub">Doctor access</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="{{ url_for('home') }}">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Login content -->
+    <main class="auth-wrapper">
+        <section class="auth-card">
+            <h1 class="auth-title">Doctor sign in</h1>
+            <p class="auth-subtitle">
+                Log in to respond to patient questions, manage follow‑ups, and grow your NexaPulse profile.
+            </p>
+
+            {% if error %}
+            <div class="auth-error">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form action="{{ url_for('doctor_login') }}" method="post" class="auth-form">
+                <label class="field">
+                    <span>Email</span>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        required
+                    >
+                </label>
+
+                <label class="field">
+                    <span>Password</span>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        minlength="6"
+                        required
+                    >
+                </label>
+
+                <div class="auth-extra">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember">
+                        <span>Keep me signed in on this device</span>
+                    </label>
+                    <a href="#" class="auth-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary big auth-submit">
+                    Continue as doctor
+                </button>
+            </form>
+
+            <p class="auth-footer-text">
+                New to NexaPulse?
+                <a href="{{ url_for('doctor_register') }}" class="auth-link">Create a doctor account</a>
+            </p>
+        </section>
+
+        <section class="auth-side">
+            <h2>Why join NexaPulse?</h2>
+            <ul>
+                <li>Connect with patients who are actively seeking expert guidance.</li>
+                <li>Build long‑term relationships with returning patients.</li>
+                <li>Showcase your verified credentials and specialization.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 NexaPulse (MedicoConnect). For registered medical professionals only.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

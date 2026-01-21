@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Chat – NexaPulse</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="body-auth">
+
+<header class="nav">
+  <div class="nav-container">
+    <div class="nav-left">
+      <div class="nav-logo-mark">
+        <span class="pulse-dot"></span>
+        <span class="pulse-line"></span>
+      </div>
+      <div class="nav-brand">
+        <span class="brand-main">NexaPulse</span>
+        <span class="brand-sub">Doctor chat</span>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="{{ url_for('doctor_dashboard') }}">Back to dashboard</a>
+      <a href="{{ url_for('doctor_logout') }}">Logout</a>
+    </nav>
+  </div>
+</header>
+
+<main class="auth-wrapper">
+  <section class="auth-card" style="max-width: 720px;">
+    <h1 class="auth-title">
+      Chat with {{ patient.name if patient else "Patient" }}
+    </h1>
+    <p class="auth-subtitle">
+      Private conversation linked to this question.
+    </p>
+
+    <!-- Question context -->
+    <div class="section-card" style="margin-bottom:1rem;">
+      <strong style="font-size:0.85rem;">Question context</strong>
+      <p style="margin-top:0.35rem; font-size:0.85rem; color:#e5e7eb;">
+        {{ question.question_text if question else "" }}
+      </p>
+    </div>
+
+    <!-- Messages list (placeholder) -->
+    <div class="section-card" style="max-height: 300px; overflow-y:auto; margin-bottom:1rem;">
+      {% if messages %}
+        {% for msg in messages %}
+          <div style="margin-bottom:0.5rem;">
+            <div style="font-size:0.75rem; color:#9ca3af;">
+              {{ msg.sender_label }} · {{ msg.created_at_display }}
+            </div>
+            <div class="chat-bubble {{ 'doctor' if msg.from_doctor else 'patient' }}">
+              {{ msg.text }}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="font-size:0.85rem; color:#9ca3af;">
+          No messages yet. Start guiding this patient here.
+        </p>
+      {% endif %}
+    </div>
+
+    <!-- Input area (for future send form) -->
+    <div class="section-card">
+      <p style="font-size:0.85rem; color:#9ca3af;">
+        Message box and send button will be added here when chat messages are implemented.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>© 2026 NexaPulse. Secure one‑to‑one doctor–patient chat.</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with Doctor – NexaPulse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        body {
+            background: #020617;
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+        }
+        .nav {
+            border-bottom: 1px solid rgba(148,163,184,0.35);
+            background: rgba(15,23,42,0.95);
+            backdrop-filter: blur(16px);
+        }
+        .nav-container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-links a {
+            color: #e5e7eb;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+        .chat-wrapper {
+            max-width: 960px;
+            margin: 1rem auto;
+            padding: 0 1rem 1.5rem;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: calc(100vh - 64px);
+            box-sizing: border-box;
+        }
+        .chat-header {
+            padding: 0.75rem 0.5rem 0.5rem;
+            border-bottom: 1px solid rgba(148,163,184,0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 20%, #22d3ee, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .chat-header-text-primary {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .chat-header-text-secondary {
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .question-banner {
+            font-size: 0.8rem;
+            color: #e5e7eb;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.5);
+            border-radius: 10px;
+            padding: 0.6rem 0.75rem;
+            margin: 0.5rem 0.2rem 0.2rem;
+        }
+        .question-banner span.label {
+            color: #a5b4fc;
+            font-weight: 500;
+            margin-right: 0.35rem;
+        }
+
+        .chat-thread {
+            margin-top: 0.4rem;
+            padding: 0.4rem 0.3rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+        .chat-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 70%;
+        }
+        .chat-row.me {
+            align-self: flex-end;
+            text-align: right;
+        }
+        .chat-row.other {
+            align-self: flex-start;
+            text-align: left;
+        }
+        .bubble {
+            padding: 0.5rem 0.7rem;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        .bubble.me {
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            color: #f9fafb;
+            border-bottom-right-radius: 4px;
+        }
+        .bubble.other {
+            background: #0b1120;
+            border: 1px solid rgba(148,163,184,0.6);
+            color: #e5e7eb;
+            border-bottom-left-radius: 4px;
+        }
+        .meta {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 0.15rem;
+        }
+
+        .chat-input-row {
+            border-top: 1px solid rgba(148,163,184,0.4);
+            padding: 0.5rem 0.3rem 0.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            background: rgba(15,23,42,0.97);
+        }
+        .chat-input-row textarea {
+            width: 100%;
+            border-radius: 10px;
+            padding: 0.5rem 0.6rem;
+            border: 1px solid #4b5563;
+            background: #020617;
+            color: #e5e7eb;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 48px;
+            max-height: 120px;
+            box-sizing: border-box;
+        }
+        .chat-input-row textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 1px rgba(99,102,241,0.5);
+        }
+        .chat-input-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .btn-primary {
+            border-radius: 999px;
+            border: none;
+            padding: 0.4rem 1.1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+
+<header class="nav">
+    <div class="nav-container">
+        <div class="nav-left">
+            <span style="font-weight:600; font-size:0.95rem;">NexaPulse</span>
+        </div>
+        <nav class="nav-links">
+            <a href="{{ url_for('patient_dashboard') }}">Back to feed</a>
+            <a href="{{ url_for('patient_logout') }}">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main class="chat-wrapper">
+
+    <!-- Header: doctor info -->
+    <div>
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="avatar">
+                    {{ doctor.name[:1] | upper }}
+                </div>
+                <div>
+                    <div class="chat-header-text-primary">
+                        Dr. {{ doctor.name }}
+                    </div>
+                    <div class="chat-header-text-secondary">
+                        {{ doctor.specialization }}{% if doctor.workplace %} · {{ doctor.workplace }}{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question banner -->
+        <div class="question-banner">
+            <span class="label">Your post:</span>
+            {{ question.question_text }}
+        </div>
+    </div>
+
+    <!-- Messages thread -->
+    <div class="chat-thread">
+        {% if messages %}
+            {% for m in messages %}
+                {% if m.sender_role == 'patient' %}
+                    <div class="chat-row me">
+                        <div class="bubble me">
+                            {{ m.message_text }}
+                        </div>
+                        <div class="meta">
+                            You · {{ m.created_at }}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="chat-row other">
+                        <div class="bubble other">
+                            {{ m.message_text }}
+                        </div>
+                        <div class="meta">
+                            Dr. {{ doctor.name }} · {{ m.created_at }}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="chat-row other">
+                <div class="bubble other">
+                    This is your private chat with Dr. {{ doctor.name }}. You can ask follow‑up questions here.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Input box -->
+    <form
+        class="chat-input-row"
+        action="{{ url_for('patient_send_message', doctor_id=doctor.id, question_id=question_id) }}"
+        method="post"
+    >
+        <textarea
+            name="message_text"
+            placeholder="Write a message..."
+            required
+        ></textarea>
+        <div class="chat-input-actions">
+            <button type="submit" class="btn-primary">
+                Send
+            </button>
+        </div>
+    </form>
+
+</main>
+
+</body>
+</html>
